@@ -13,6 +13,7 @@ public class Game{
     //0 - cell is empty;
     //1 - there is a part of snake on the cell;
     //2 - there is a frog on the cell;
+    //Hello git
     private int[][] field;
 
     public Game(){
