@@ -1,39 +1,56 @@
 package com.epam.java.javafx.snake.java.model;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Created by Aleksandr_Vaniukov on 11/23/2016.
  */
 public class Snake {
 
-    private ArrayList<SnakePart>body;
+    private LinkedList<SnakePart> body;
 
     private final int UP=0;
     private final int LEFT=1;
     private final int DOWN=2;
     private final int RIGHT=3;
-    private int[][] field;
+    private int growth;
     //Help to organize one turn
     private boolean wasTurn;
+    private boolean wouldGrow;
+    private int[][] field;
 
     private int direction=2;
 
-    public Snake(int[][]field){
+    public Snake(int[][] field){
 
-        this.field=field;
-        this.body=new ArrayList<SnakePart>();
+        this.growth=Options.getLength();
+        this.body=new LinkedList<SnakePart>();
         this.wasTurn=false;
+        this.wouldGrow=false;
+        this.field=field;
         for(int i=Options.getLength()-1;i>=0;i--){
             this.body.add(new SnakePart(0, i));
         }
     }
 
-    public ArrayList<SnakePart> getBody(){
+    public LinkedList<SnakePart> getBody(){
         return body;
     }
 
+    public SnakePart getHead(){
+        return this.body.get(0);
+    }
+
+    public SnakePart getQueue(){
+        return this.body.get(this.body.size()-1);
+    }
+
     public void move(){
+
+        if(!wouldGrow) {
+            eraseTrace();
+        }
 
         for(int i=body.size()-1, j=body.size()-2;i>0;i--,j--){
             body.get(i).setX(body.get(j).getX());
@@ -64,6 +81,7 @@ public class Snake {
         }
 
         wasTurn=false;
+        wouldGrow=false;
     }
 
     public void turnLeft(){
@@ -87,6 +105,18 @@ public class Snake {
     }
 
     public void growSnake(){
+        if(growth+1<Options.getMaxLength()) {
+            growth++;
+            wouldGrow = true;
+            body.add(new SnakePart(getQueue().getX(), getQueue().getY()));
+        }
+    }
 
+    public void track(){
+        field[getHead().getY()][getHead().getX()]=1;
+    }
+
+    private void eraseTrace(){
+        field[getQueue().getY()][getQueue().getX()]=0;
     }
 }

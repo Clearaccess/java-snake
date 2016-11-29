@@ -7,4 +7,6 @@ public class Constants {
     public static final int WIDTH_CELL=20;
     public static final int HEIGHT_CELL=20;
     public static final int OFFSET=1;
+    public static final int MAX_ROW=1000;
+    public static final int MAX_COL=1000;
 }

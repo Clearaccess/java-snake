@@ -23,9 +23,13 @@ import javafx.util.Duration;
 
 import javax.swing.*;
 import java.io.Console;
+import java.util.LinkedList;
 
 public class View {
 
+    private final int GREEN=0;
+    private final int RED=1;
+    private final int BLUE=2;
     @FXML
     private Label score;
     @FXML
@@ -68,48 +72,20 @@ public class View {
                         draw(times);
                         if(Options.getSpeed()==times){
 
-                            System.out.println("Times zero out");
+                            //System.out.println("Times zero out");
                             times=0;
                         }
                         times++;
                     }
                 });
         gameLoop.getKeyFrames().add( kf );
-        //gameLoop.play();
-        //gameLoop.pause();
-        /*
-        timer=new AnimationTimer() {
-            double timesSnake=0.0;
-            double timesFrog=0.0;
-
-            public void handle(long currentNanoTime) {
-
-                if(Options.getSpeed()<timesSnake*1.6){
-
-                    System.out.println("Draw Snake");
-                    world.update();
-                    drawField(gc);
-                    drawSnake(gc,world.getSnake());
-                    timesSnake=0.0;
-                }
-
-                if(Options.getSpeedFrog()<timesFrog*1.6){
-
-                    System.out.println("Draw Frogs");
-                    timesFrog=0.0;
-                }
-
-                timesSnake++;
-                timesFrog++;
-            }
-        };
-        */
     }
 
     private void draw(long time){
         if(time==Options.getSpeed()){
             drawField();
             drawSnake(world.getSnake());
+            drawFrogs(world.getFrogs());
         }
     }
     private void drawField(){
@@ -146,6 +122,13 @@ public class View {
         gc.fillOval(x * Constants.OFFSET + x * Constants.WIDTH_CELL+offsetX, y * Constants.OFFSET + y * Constants.HEIGHT_CELL+offsetY, ((double)Constants.WIDTH_CELL)/4.0, ((double)Constants.HEIGHT_CELL)/4.0);
     }
 
+    private void drawFrog(int x,int y, Color clr){
+        gc.setFill(clr);
+        double offsetX=((double)Constants.WIDTH_CELL)/(2.0*2);
+        double offsetY=((double)Constants.HEIGHT_CELL)/(2.0*2);
+        gc.fillOval(x * Constants.OFFSET + x * Constants.WIDTH_CELL+(offsetX), y * Constants.OFFSET + y * Constants.HEIGHT_CELL+(offsetY), ((double)Constants.WIDTH_CELL)/2.0, ((double)Constants.HEIGHT_CELL)/2.0);
+    }
+
     private void drawSnake(Snake snake){
 
         int count=-1;
@@ -164,8 +147,20 @@ public class View {
         }
     }
 
-    private void drawFrogs(){
-
+    private void drawFrogs(LinkedList<Frog>frogs){
+        for(Frog i:frogs){
+            switch (i.getType()){
+                case GREEN:
+                    drawFrog(i.getX(),i.getY(),Color.GREEN);
+                    break;
+                case RED:
+                    drawFrog(i.getX(),i.getY(),Color.RED);
+                    break;
+                case BLUE:
+                    drawFrog(i.getX(),i.getY(),Color.BLUE);
+                    break;
+            }
+        }
     }
 
     @FXML

@@ -7,6 +7,7 @@ public class Options {
     private static int row=10;
     private static int col=10;
     private static int length=1;
+    private static int maxLength=80;
     private static int numFrog=1;
     private static long speed=100;
     private static long speedFrog=150;
@@ -16,7 +17,7 @@ public class Options {
     }
 
     public static void setRow(int value){
-        if(value>row) {
+        if(value>row && row<Constants.MAX_ROW) {
             row=value;
         }
     }
@@ -26,7 +27,7 @@ public class Options {
     }
 
     public static void setCol(int value){
-        if(value>col) {
+        if(value>col && col<Constants.MAX_COL) {
             col=value;
         }
     }
@@ -38,7 +39,12 @@ public class Options {
     public static void setLength(int value){
         if(value>length) {
             length=value;
+            maxLength=row*col/10*8;
         }
+    }
+
+    public static int getMaxLength(){
+        return maxLength;
     }
 
     public static int getFrog(){
