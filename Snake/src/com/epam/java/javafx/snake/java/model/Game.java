@@ -14,6 +14,7 @@ import java.util.LinkedList;
 public class Game{
     private Snake snake;
     private LinkedList<Frog>frogs;
+    private int score;
     //0 - cell is empty;
     //1 - there is a part of snake on the cell;
     //2 - there is a frog on the cell;
@@ -22,16 +23,21 @@ public class Game{
     private Random number;
 
     public Game(){
+        this.score=0;
         this.field=new int[Options.getRow()][Options.getCol()];
         this.number=new Random(Calendar.getInstance().getTimeInMillis());
         this.snake=new Snake(field);
         fillFieldSnake();
         this.frogs=placeForgs();
         fillFieldFrogs();
+
     }
 
     public Snake getSnake(){
         return snake;
+    }
+    public int getScore(){
+        return score;
     }
 
     public LinkedList<Frog> getFrogs(){
@@ -52,6 +58,7 @@ public class Game{
                 removeFrog(snake.getHead().getX(),snake.getHead().getY());
                 snake.track();
                 addFrog();
+                score++;
             }
             snake.track();
 
@@ -61,6 +68,7 @@ public class Game{
                 }
                 System.out.println();
             }
+            System.out.println("--------------");
         }
     }
 
@@ -77,7 +85,7 @@ public class Game{
         return false;
     }
     private boolean isFrogOnCell(int x,int y){
-        return field[y][x]==2;
+        return field[x][y]==2;
     }
 
     private LinkedList<Frog> placeForgs(){
@@ -92,17 +100,17 @@ public class Game{
 
     private void addFrog(){
         Frog newFrog=placeFrog();
-        field[newFrog.getY()][newFrog.getX()]=2;
         this.frogs.add(newFrog);
     }
 
     private void removeFrog(int x, int y){
-        field[y][x]=0;
+        field[x][y]=0;
         for(Frog i: frogs){
             if(i.getX()==x
                     &&
                     i.getY()==y){
                 frogs.remove(i);
+                System.out.println("Delete frog success");
                 break;
             }
         }
@@ -115,21 +123,21 @@ public class Game{
             x=number.nextInt(Options.getRow());
             y=number.nextInt(Options.getCol());
         }
-        while(field[y][x]==1 && field[y][x]==2);
+        while(field[x][y]!=0);
 
-        field[y][x]=2;
+        field[x][y]=2;
         return new RedFrog(x,y);
     }
 
     private void fillFieldSnake(){
         for(SnakePart i:snake.getBody()){
-            field[i.getY()][i.getX()]=1;
+            field[i.getX()][i.getY()]=1;
         }
     }
 
     private void fillFieldFrogs(){
         for(Frog i:frogs){
-            field[i.getY()][i.getX()]=2;
+            field[i.getX()][i.getY()]=2;
         }
     }
 

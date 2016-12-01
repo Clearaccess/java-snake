@@ -7,10 +7,14 @@ public class Options {
     private static int row=10;
     private static int col=10;
     private static int length=1;
-    private static int maxLength=80;
+    private static int maxLength=50;
     private static int numFrog=1;
     private static long speed=100;
     private static long speedFrog=150;
+
+    private static long numGreenFrogs=0;
+    private static long numRedFrogs=0;
+    private static long numBlueFrogs=0;
 
     public static int getRow(){
         return row;
@@ -39,7 +43,7 @@ public class Options {
     public static void setLength(int value){
         if(value>length) {
             length=value;
-            maxLength=row*col/10*8;
+            maxLength=row*col/10*5;
         }
     }
 

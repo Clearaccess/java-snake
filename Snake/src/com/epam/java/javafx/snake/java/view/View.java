@@ -55,6 +55,7 @@ public class View {
         world=new Game();
         drawField();
         drawSnake(world.getSnake());
+        drawFrogs(world.getFrogs());
 
         gameLoop = new Timeline();
         gameLoop.setCycleCount( Timeline.INDEFINITE );
@@ -70,6 +71,7 @@ public class View {
                     {
                         world.update(times);
                         draw(times);
+                        score.setText(Integer.toString(world.getScore()));
                         if(Options.getSpeed()==times){
 
                             //System.out.println("Times zero out");
@@ -134,7 +136,7 @@ public class View {
         int count=-1;
         for(SnakePart i: snake.getBody()) {
             count++;
-            System.out.println(i.getX()+" "+i.getY());
+            //System.out.println(i.getX()+" "+i.getY());
             if (count == 0) {
                 drawHeadSnake(i.getX(), i.getY());
                 continue;

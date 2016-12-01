@@ -113,10 +113,10 @@ public class Snake {
     }
 
     public void track(){
-        field[getHead().getY()][getHead().getX()]=1;
+        field[getHead().getX()][getHead().getY()]=1;
     }
 
     private void eraseTrace(){
-        field[getQueue().getY()][getQueue().getX()]=0;
+        field[getQueue().getX()][getQueue().getY()]=0;
     }
 }
