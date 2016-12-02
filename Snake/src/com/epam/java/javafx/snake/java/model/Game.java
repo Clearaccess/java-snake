@@ -7,88 +7,114 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.LinkedList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Aleksandr_Vaniukov on 11/23/2016.
  */
 public class Game{
     private Snake snake;
+    private Thread threadSnake;
     private LinkedList<Frog>frogs;
+    private LinkedList<Thread> threadsFrogs;
     private int score;
+    private static Lock lock=new ReentrantLock();
+    private Random number;
     //0 - cell is empty;
     //1 - there is a part of snake on the cell;
     //2 - there is a frog on the cell;
 
-    private int[][] field;
-    private Random number;
+    private static int[][] field;
+    private static Game game;
 
-    public Game(){
+    private Game(){
         this.score=0;
         this.field=new int[Options.getRow()][Options.getCol()];
         this.number=new Random(Calendar.getInstance().getTimeInMillis());
-        this.snake=new Snake(field);
+        snake=new Snake();
         fillFieldSnake();
-        this.frogs=placeForgs();
+        frogs=placeFrogs();
         fillFieldFrogs();
+    }
 
+    public synchronized static Game getGame(){
+
+        if (game==null) {
+            game=new Game();
+        }
+
+        return game;
     }
 
     public Snake getSnake(){
-        return snake;
-    }
-    public int getScore(){
-        return score;
+        return this.snake;
     }
 
     public LinkedList<Frog> getFrogs(){
         return frogs;
     }
 
-    public void update(long currentTick){
-        if(currentTick==Options.getSpeed())
-        {
-            snake.move();
-            if(ateItself()){
-                //Game over
-                System.out.println("Snake ate himself");
-            }
+    public int getScore(){
+        return this.score;
+    }
+    public void increaseScore(int value){
+        this.score+=value;
+    }
 
-            if(isFrogOnCell(snake.getHead().getX(),snake.getHead().getY())){
-                snake.growSnake();
-                removeFrog(snake.getHead().getX(),snake.getHead().getY());
-                snake.track();
-                addFrog();
-                score++;
-            }
-            snake.track();
+    public int[][] takeField(){
+        System.out.println("Try lock");
+        Game.lock.lock();
+        System.out.println("Lock");
+        return this.field;
+    }
 
-            for(int i=0;i<field.length;i++){
-                for(int j=0;j<field.length;j++){
-                    System.out.print(field[i][j]);
-                }
-                System.out.println();
+    public void leaveField(){
+        System.out.println("UnLock");
+        Game.lock.unlock();
+    }
+
+    public Frog getFrog(int x,int y){
+
+        for(Frog i:frogs){
+            if(i.getX()==x && i.getY()==y)
+            {
+                return i;
             }
-            System.out.println("--------------");
+        }
+
+        return null;
+    }
+
+    public void startGame(){
+        threadSnake=new Thread(snake);
+        threadsFrogs=new LinkedList<Thread>();
+        for(int i=0;i<frogs.size();i++){
+            threadsFrogs.add(new Thread(frogs.get(i)));
+        }
+
+        Running.running=true;
+        threadSnake.start();
+        for(int i=0;i<frogs.size();i++){
+            threadsFrogs.get(i).start();
         }
     }
 
-    private boolean ateItself(){
-        SnakePart head=snake.getHead();
-        LinkedList<SnakePart>body=snake.getBody();
-        for(int i=1;i<snake.getBody().size();i++){
-            if((body.get(i).getX()==head.getX())
-                    &&
-                    (body.get(i).getY()==head.getY())){
-                return true;
-            }
-        }
-        return false;
-    }
-    private boolean isFrogOnCell(int x,int y){
-        return field[x][y]==2;
+    public void pauseGame(){
+        Running.pause=!Running.pause;
     }
 
-    private LinkedList<Frog> placeForgs(){
+    public void stopGame(){
+        Running.running=!Running.running;
+    }
+
+
+    private LinkedList<Frog> placeFrogs(){
         int i=0;
         LinkedList<Frog>frogs=new LinkedList<Frog>();
         while(i<Options.getFrog()){
@@ -101,19 +127,19 @@ public class Game{
     private void addFrog(){
         Frog newFrog=placeFrog();
         this.frogs.add(newFrog);
+        this.threadsFrogs.add(new Thread(newFrog));
     }
 
-    private void removeFrog(int x, int y){
-        field[x][y]=0;
-        for(Frog i: frogs){
-            if(i.getX()==x
-                    &&
-                    i.getY()==y){
+    public void removeFrog(){
+        for(int i=0;i<threadsFrogs.size();i++){
+            if(!threadsFrogs.get(i).isAlive()){
+                threadsFrogs.remove(i);
                 frogs.remove(i);
-                System.out.println("Delete frog success");
                 break;
             }
         }
+
+        addFrog();
     }
 
     private Frog placeFrog(){
@@ -123,21 +149,20 @@ public class Game{
             x=number.nextInt(Options.getRow());
             y=number.nextInt(Options.getCol());
         }
-        while(field[x][y]!=0);
+        while(field[x][y]!=Constants.EMPTY_CELL);
 
-        field[x][y]=2;
+        field[x][y]=Constants.FROG_INTO_CELL;
         return new RedFrog(x,y);
-    }
-
-    private void fillFieldSnake(){
-        for(SnakePart i:snake.getBody()){
-            field[i.getX()][i.getY()]=1;
-        }
     }
 
     private void fillFieldFrogs(){
         for(Frog i:frogs){
             field[i.getX()][i.getY()]=2;
+        }
+    }
+    private void fillFieldSnake(){
+        for(SnakePart i:snake.getBody()){
+            field[i.getX()][i.getY()]=1;
         }
     }
 

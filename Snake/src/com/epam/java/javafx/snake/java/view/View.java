@@ -42,8 +42,6 @@ public class View {
     private Game world;
     private GraphicsContext gc;
 
-
-
     @FXML
     private void initialize() {
         canvas.setWidth(Options.getCol() * Constants.WIDTH_CELL + Options.getCol() * 1);
@@ -52,7 +50,7 @@ public class View {
         sppane.setOnMouseClicked(event-> clickedMouse(event.getButton().toString()));
         System.out.println("Start");
 
-        world=new Game();
+        world=Game.getGame();
         drawField();
         drawSnake(world.getSnake());
         drawFrogs(world.getFrogs());
@@ -69,7 +67,6 @@ public class View {
                     long timesFrog=0;
                     public void handle(ActionEvent ae)
                     {
-                        world.update(times);
                         draw(times);
                         score.setText(Integer.toString(world.getScore()));
                         if(Options.getSpeed()==times){
@@ -81,14 +78,13 @@ public class View {
                     }
                 });
         gameLoop.getKeyFrames().add( kf );
+
     }
 
-    private void draw(long time){
-        if(time==Options.getSpeed()){
-            drawField();
-            drawSnake(world.getSnake());
-            drawFrogs(world.getFrogs());
-        }
+    private void draw(long time) {
+        drawField();
+        drawSnake(world.getSnake());
+        drawFrogs(world.getFrogs());
     }
     private void drawField(){
         for (int i = 0; i < Options.getRow(); i++) {
@@ -168,6 +164,7 @@ public class View {
     @FXML
     public void clickStart(){
         //timer.start();
+        world.startGame();
         gameLoop.play();
     }
 

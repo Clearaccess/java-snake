@@ -6,7 +6,7 @@ import java.util.LinkedList;
 /**
  * Created by Aleksandr_Vaniukov on 11/23/2016.
  */
-public class Snake {
+public class Snake implements Runnable {
 
     private LinkedList<SnakePart> body;
 
@@ -18,17 +18,16 @@ public class Snake {
     //Help to organize one turn
     private boolean wasTurn;
     private boolean wouldGrow;
-    private int[][] field;
+    private Game game;
 
     private int direction=2;
 
-    public Snake(int[][] field){
+    public Snake(){
 
         this.growth=Options.getLength();
         this.body=new LinkedList<SnakePart>();
         this.wasTurn=false;
         this.wouldGrow=false;
-        this.field=field;
         for(int i=Options.getLength()-1;i>=0;i--){
             this.body.add(new SnakePart(0, i));
         }
@@ -46,10 +45,48 @@ public class Snake {
         return this.body.get(this.body.size()-1);
     }
 
-    public void move(){
+    public void run(){
+        while(Running.running){
+            game=Game.getGame();
+            int[][]field=game.takeField();
+
+            move(field);
+            if(checkEndGame(field)){
+                Running.running=false;
+                game.leaveField();
+                System.out.println("GAME OVER");
+                break;
+            }
+
+            if(isFrogOnCell(field)){
+                Frog frog=game.getFrog(getHead().getX(),getHead().getY());
+                eat(frog,field);
+                changeScore(frog);
+            }
+
+            track(field);
+
+            for(int i=0;i<Options.getRow();i++){
+                for(int j=0;j<Options.getCol();j++){
+                    System.out.print(field[i][j]);
+                }
+                System.out.println();
+            }
+            System.out.println("__________");
+            game.leaveField();
+
+            try {
+                Thread.sleep(Options.getSpeed());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void move(int[][] field){
 
         if(!wouldGrow) {
-            eraseTrace();
+            eraseTrace(field);
         }
 
         for(int i=body.size()-1, j=body.size()-2;i>0;i--,j--){
@@ -104,6 +141,13 @@ public class Snake {
         }
     }
 
+    private void eat(Frog frog, int[][] field){
+        switch (frog.getType()){
+            case 0: growSnake();break;
+            case 1: decreaseSnake(field);break;
+        }
+    }
+
     public void growSnake(){
         if(growth+1<Options.getMaxLength()) {
             growth++;
@@ -112,11 +156,62 @@ public class Snake {
         }
     }
 
-    public void track(){
-        field[getHead().getX()][getHead().getY()]=1;
+    public void decreaseSnake(int[][] field){
+        if(growth-1>1) {
+            SnakePart queue=getQueue();
+            growth--;
+            field[queue.getX()][queue.getY()]=0;
+            body.remove(getQueue());
+        }
     }
 
-    private void eraseTrace(){
-        field[getQueue().getX()][getQueue().getY()]=0;
+    public void track(int[][]field){
+        SnakePart head=getHead();
+        field[head.getX()][head.getY()]=1;
+    }
+
+    private void eraseTrace(int[][]field){
+        SnakePart queue=getQueue();
+        field[queue.getX()][queue.getY()]=0;
+    }
+
+    private boolean isFrogOnCell(int[][] field){
+        SnakePart head=getHead();
+        return field[head.getX()][head.getY()]>=2;
+    }
+
+    private boolean checkEndGame(int[][] field){
+        return ateItself() || ateBlueFrog(field);
+    }
+
+    private boolean ateItself(){
+        SnakePart head=this.getHead();
+        LinkedList<SnakePart>body=this.getBody();
+        for(int i=1;i<this.getBody().size();i++){
+            if((body.get(i).getX()==head.getX())
+                    &&
+                    (body.get(i).getY()==head.getY())){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean ateBlueFrog(int[][]field){
+        SnakePart head=getHead();
+
+        if(field[head.getX()][head.getY()]==1){
+            Frog frog=game.getFrog(head.getX(),head.getY());
+            return frog.getType()==2;
+        }
+
+        return false;
+    }
+
+    private void changeScore(Frog frog){
+        switch (frog.getType()){
+            case 0:game.increaseScore(1);break;
+            case 1:game.increaseScore(2);break;
+        }
     }
 }

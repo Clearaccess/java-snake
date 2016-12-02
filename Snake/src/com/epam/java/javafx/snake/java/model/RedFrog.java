@@ -3,10 +3,11 @@ package com.epam.java.javafx.snake.java.model;
 /**
  * Created by Aleksandr_Vaniukov on 11/24/2016.
  */
-public class RedFrog implements Frog{
+public class RedFrog extends Frog{
     private int x;
     private int y;
     private int type;
+    private Game game;
 
     public RedFrog(int x,int y){
         this.x=x;
@@ -24,5 +25,20 @@ public class RedFrog implements Frog{
 
     public int getType(){
         return this.type;
+    }
+
+    public void run() {
+        while (Running.running){
+            int[][] field=game.takeField();
+
+            if(field[x][y]==1){
+                game.removeFrog();
+                game.leaveField();
+                break;
+            }
+
+            //Move
+            game.leaveField();
+        }
     }
 }

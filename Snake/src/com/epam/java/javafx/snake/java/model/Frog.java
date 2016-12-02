@@ -3,12 +3,13 @@ package com.epam.java.javafx.snake.java.model;
 /**
  * Created by Aleksandr_Vaniukov on 11/23/2016.
  */
-public interface Frog {
+public abstract class Frog implements Runnable {
     //Types frogs
     // 0 - Green
     // 1 - Red
     // 2 - Blue
-    int getX();
-    int getY();
-    int getType();
+
+    public abstract int getX();
+    public abstract int getY();
+    public abstract int getType();
 }
