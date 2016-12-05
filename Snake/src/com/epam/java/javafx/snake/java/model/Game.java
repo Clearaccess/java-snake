@@ -32,14 +32,16 @@ public class Game{
 
     private static int[][] field;
     private static Game game;
+    private boolean gameOver;
+    private boolean pause;
 
     private Game(){
         this.score=0;
         this.field=new int[Options.getRow()][Options.getCol()];
         this.number=new Random(Calendar.getInstance().getTimeInMillis());
-        snake=new Snake();
+        this.snake=new Snake();
         fillFieldSnake();
-        frogs=placeFrogs();
+        this.frogs=placeFrogs();
         fillFieldFrogs();
     }
 
@@ -50,6 +52,17 @@ public class Game{
         }
 
         return game;
+    }
+
+    public boolean isPause(){
+        return pause;
+    }
+
+    public boolean getGameOver(){
+        return gameOver;
+    }
+    public void setGameOver(){
+        gameOver=true;
     }
 
     public Snake getSnake(){
@@ -68,14 +81,11 @@ public class Game{
     }
 
     public int[][] takeField(){
-        System.out.println("Try lock");
         Game.lock.lock();
-        System.out.println("Lock");
         return this.field;
     }
 
     public void leaveField(){
-        System.out.println("UnLock");
         Game.lock.unlock();
     }
 
@@ -107,6 +117,7 @@ public class Game{
 
     public void pauseGame(){
         Running.pause=!Running.pause;
+        pause=!pause;
     }
 
     public void stopGame(){
@@ -128,17 +139,19 @@ public class Game{
         Frog newFrog=placeFrog();
         this.frogs.add(newFrog);
         this.threadsFrogs.add(new Thread(newFrog));
+        System.out.println("Add frog");
     }
 
-    public void removeFrog(){
-        for(int i=0;i<threadsFrogs.size();i++){
-            if(!threadsFrogs.get(i).isAlive()){
-                threadsFrogs.remove(i);
-                frogs.remove(i);
-                break;
-            }
-        }
+    public void removeFrog(Frog frog){
 
+        int index=this.frogs.indexOf(frog);
+
+        System.out.println("Index delete frog "+ index);
+        threadsFrogs.get(index).interrupt();
+        threadsFrogs.remove(index);
+        frogs.remove(index);
+
+        System.out.println("Delete frog");
         addFrog();
     }
 
@@ -152,7 +165,8 @@ public class Game{
         while(field[x][y]!=Constants.EMPTY_CELL);
 
         field[x][y]=Constants.FROG_INTO_CELL;
-        return new RedFrog(x,y);
+
+        return new BlueFrog(x,y);
     }
 
     private void fillFieldFrogs(){

@@ -67,6 +67,10 @@ public class View {
                     long timesFrog=0;
                     public void handle(ActionEvent ae)
                     {
+                        if(world.getGameOver()){
+                            closeGame();
+                        }
+
                         draw(times);
                         score.setText(Integer.toString(world.getScore()));
                         if(Options.getSpeed()==times){
@@ -149,7 +153,7 @@ public class View {
         for(Frog i:frogs){
             switch (i.getType()){
                 case GREEN:
-                    drawFrog(i.getX(),i.getY(),Color.GREEN);
+                    drawFrog(i.getX(),i.getY(),Color.LIGHTGREEN);
                     break;
                 case RED:
                     drawFrog(i.getX(),i.getY(),Color.RED);
@@ -162,22 +166,28 @@ public class View {
     }
 
     @FXML
-    public void clickStart(){
-        //timer.start();
+    public void clickStart() {
         world.startGame();
         gameLoop.play();
     }
 
     @FXML
     public void clickPause(){
-        //timer.stop();
-        gameLoop.pause();
+
+        world.pauseGame();
+        if(world.isPause()) {
+            gameLoop.pause();
+        } else{
+            gameLoop.play();
+        }
+
     }
 
     @FXML
     public void clickStop(){
         //timer.stop();
-        gameLoop.pause();
+        world.stopGame();
+        closeGame();
     }
 
     public void clickedMouse(String button){
@@ -189,5 +199,10 @@ public class View {
             world.getSnake().turnRight();
             System.out.println("RIGHT");
         }
+    }
+
+    private void closeGame(){
+        gameLoop.stop();
+        System.exit(1);
     }
 }

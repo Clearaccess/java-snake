@@ -12,7 +12,7 @@ public class BlueFrog extends Frog {
     public BlueFrog(int x,int y){
         this.x=x;
         this.y=y;
-        type=2;
+        this.type=Constants.BLUE_FROG;
     }
 
     public int getX(){
@@ -29,22 +29,30 @@ public class BlueFrog extends Frog {
 
     public void run() {
         game=Game.getGame();
-        while (Running.running){
-            int[][] field=game.takeField();
+        while (Running.running && !Thread.currentThread().isInterrupted()){
+            if(!Running.pause) {
 
-            if(field[x][y]==1){
-                game.removeFrog();
+
+                int[][] field = game.takeField();
+
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
+
+                //Move
                 game.leaveField();
-                break;
-            }
 
-            //Move
-            game.leaveField();
-
-            try {
-                Thread.sleep(Options.getSpeedFrog());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                try {
+                    Thread.sleep(Options.getSpeedFrog());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

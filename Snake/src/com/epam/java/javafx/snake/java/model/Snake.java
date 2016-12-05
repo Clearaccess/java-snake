@@ -46,39 +46,51 @@ public class Snake implements Runnable {
     }
 
     public void run(){
-        while(Running.running){
-            game=Game.getGame();
-            int[][]field=game.takeField();
+        game=Game.getGame();
+        while(Running.running) {
 
-            move(field);
-            if(checkEndGame(field)){
-                Running.running=false;
-                game.leaveField();
-                System.out.println("GAME OVER");
-                break;
-            }
+            if (!Running.pause) {
 
-            if(isFrogOnCell(field)){
-                Frog frog=game.getFrog(getHead().getX(),getHead().getY());
-                eat(frog,field);
-                changeScore(frog);
-            }
+                int[][] field = game.takeField();
 
-            track(field);
-
-            for(int i=0;i<Options.getRow();i++){
-                for(int j=0;j<Options.getCol();j++){
-                    System.out.print(field[i][j]);
+                move(field);
+                if (checkEndGame(field)) {
+                    Running.running = false;
+                    game.leaveField();
+                    game.setGameOver();
+                    System.out.println("GAME OVER");
+                    break;
                 }
-                System.out.println();
-            }
-            System.out.println("__________");
-            game.leaveField();
 
-            try {
-                Thread.sleep(Options.getSpeed());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                if (isFrogOnCell(field)) {
+                    Frog frog = game.getFrog(getHead().getX(), getHead().getY());
+                    eat(frog, field);
+                    changeScore(frog);
+                    game.removeFrog(frog);
+                }
+
+                track(field);
+
+                for (int i = 0; i < Options.getRow(); i++) {
+                    for (int j = 0; j < Options.getCol(); j++) {
+                        System.out.print(field[i][j]);
+                    }
+                    System.out.println();
+                }
+                System.out.println("__________");
+                game.leaveField();
+
+                try {
+                    Thread.sleep(Options.getSpeed());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -200,9 +212,9 @@ public class Snake implements Runnable {
     private boolean ateBlueFrog(int[][]field){
         SnakePart head=getHead();
 
-        if(field[head.getX()][head.getY()]==1){
+        if(field[head.getX()][head.getY()]==Constants.FROG_INTO_CELL){
             Frog frog=game.getFrog(head.getX(),head.getY());
-            return frog.getType()==2;
+            return frog.getType()==Constants.BLUE_FROG;
         }
 
         return false;
