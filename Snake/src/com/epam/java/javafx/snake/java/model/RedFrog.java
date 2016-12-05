@@ -1,5 +1,7 @@
 package com.epam.java.javafx.snake.java.model;
 
+import com.epam.java.javafx.snake.java.controller.Game;
+
 /**
  * Created by Aleksandr_Vaniukov on 11/24/2016.
  */
@@ -55,5 +57,8 @@ public class RedFrog extends Frog{
                 }
             }
         }
+    }
+
+    public void kill(){
     }
 }

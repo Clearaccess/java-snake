@@ -51,11 +51,11 @@ public class Options {
         return maxLength;
     }
 
-    public static int getFrog(){
+    public static int getNumFrog(){
         return numFrog;
     }
 
-    public static void setFrog(int value){
+    public static void setNumFrog(int value){
         if(value>numFrog) {
             numFrog = value;
         }
@@ -69,7 +69,7 @@ public class Options {
         if(value>speed) {
             speed=value;
         }
-        setSpeedFrog(speed/2);
+        setSpeedFrog(speed+speed/2);
     }
 
     public static long getSpeedFrog(){

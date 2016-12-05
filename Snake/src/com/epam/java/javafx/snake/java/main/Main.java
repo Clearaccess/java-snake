@@ -24,7 +24,7 @@ public class Main extends Application {
             Options.setRow(Integer.parseInt(args[0]));
             Options.setCol(Integer.parseInt(args[1]));
             Options.setLength(Integer.parseInt(args[2]));
-            Options.setFrog(Integer.parseInt(args[3]));
+            Options.setNumFrog(Integer.parseInt(args[3]));
             Options.setSpeed(Integer.parseInt(args[4]));
         }
         launch(args);

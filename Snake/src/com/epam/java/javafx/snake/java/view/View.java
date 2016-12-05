@@ -1,29 +1,21 @@
 package com.epam.java.javafx.snake.java.view;
 
-import com.epam.java.javafx.snake.java.controller.Controller;
-import com.epam.java.javafx.snake.java.main.Main;
+import com.epam.java.javafx.snake.java.controller.Game;
 import com.epam.java.javafx.snake.java.model.*;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.stage.Window;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import javax.swing.*;
-import java.io.Console;
-import java.util.LinkedList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class View {
 
@@ -52,7 +44,7 @@ public class View {
 
         world=Game.getGame();
         drawField();
-        drawSnake(world.getSnake());
+        drawSnake(world.getSnake().getBody());
         drawFrogs(world.getFrogs());
 
         gameLoop = new Timeline();
@@ -87,7 +79,7 @@ public class View {
 
     private void draw(long time) {
         drawField();
-        drawSnake(world.getSnake());
+        drawSnake(world.getSnake().getBody());
         drawFrogs(world.getFrogs());
     }
     private void drawField(){
@@ -131,17 +123,17 @@ public class View {
         gc.fillOval(x * Constants.OFFSET + x * Constants.WIDTH_CELL+(offsetX), y * Constants.OFFSET + y * Constants.HEIGHT_CELL+(offsetY), ((double)Constants.WIDTH_CELL)/2.0, ((double)Constants.HEIGHT_CELL)/2.0);
     }
 
-    private void drawSnake(Snake snake){
+    private void drawSnake(CopyOnWriteArrayList<SnakePart> body){
 
         int count=-1;
-        for(SnakePart i: snake.getBody()) {
+        for(SnakePart i: body) {
             count++;
             //System.out.println(i.getX()+" "+i.getY());
             if (count == 0) {
                 drawHeadSnake(i.getX(), i.getY());
                 continue;
             }
-            if (count == snake.getBody().size() - 1) {
+            if (count == body.size() - 1) {
                 drawQueueSnake(i.getX(), i.getY());
                 continue;
             }
@@ -149,7 +141,7 @@ public class View {
         }
     }
 
-    private void drawFrogs(LinkedList<Frog>frogs){
+    private void drawFrogs(CopyOnWriteArrayList<Frog> frogs){
         for(Frog i:frogs){
             switch (i.getType()){
                 case GREEN:

@@ -17,4 +17,8 @@ public class Constants {
     public static final int GREEN_FROG=0;
     public static final int RED_FROG=1;
     public static final int BLUE_FROG=2;
+
+    public static double COEFF_GREEN_FROGS=0.6;
+    public static double COEFF_RED_FROGS=0.3;
+    public static double COEFF_BLUE_FROGS=0.1;
 }
