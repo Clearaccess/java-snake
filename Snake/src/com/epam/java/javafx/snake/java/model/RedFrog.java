@@ -37,6 +37,7 @@ public class RedFrog extends Frog{
                 int[][] field = game.takeField();
 
                 if (Thread.currentThread().isInterrupted()) {
+                    game.leaveField();
                     break;
                 }
 

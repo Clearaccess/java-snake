@@ -38,19 +38,18 @@ public class GreenFrog extends Frog {
 
                 int[][] field = game.takeField();
 
-                System.out.println(3);
                 if (Thread.currentThread().isInterrupted()) {
+                    game.leaveField();
                     break;
                 }
 
+                /*
                 if(canMove(x,y,field)) {
                     move(field);
                 }
-
+                */
 
                 game.leaveField();
-
-                System.out.println(4);
                 try {
                     Thread.sleep(Options.getSpeedFrog());
                 } catch (InterruptedException e) {

@@ -59,10 +59,6 @@ public class View {
                     long timesFrog=0;
                     public void handle(ActionEvent ae)
                     {
-                        if(world.getGameOver()){
-                            closeGame();
-                        }
-
                         draw(times);
                         score.setText(Integer.toString(world.getScore()));
                         if(Options.getSpeed()==times){
