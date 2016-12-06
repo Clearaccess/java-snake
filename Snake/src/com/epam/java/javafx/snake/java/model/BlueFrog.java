@@ -1,6 +1,7 @@
 package com.epam.java.javafx.snake.java.model;
 
 import com.epam.java.javafx.snake.java.controller.Game;
+import com.epam.java.javafx.snake.java.model.impl.IMoveFrog;
 
 /**
  * Created by Aleksandr on 11/27/2016.
@@ -10,19 +11,30 @@ public class BlueFrog extends Frog {
     private int y;
     private int type;
     private Game game;
+    private boolean death;
+    private IMoveFrog strategyMove;
 
     public BlueFrog(int x,int y){
         this.x=x;
         this.y=y;
         this.type=Constants.BLUE_FROG;
+        this.strategyMove=new MoveBlueFrog();
     }
 
     public int getX(){
         return this.x;
     }
 
+    public void setX(int value){
+        this.x=value;
+    }
+
     public int getY(){
         return this.y;
+    }
+
+    public void setY(int value){
+        this.y=value;
     }
 
     public int getType(){
@@ -42,7 +54,8 @@ public class BlueFrog extends Frog {
                     break;
                 }
 
-                //Move
+                move(game.getSnake(),field);
+
                 game.leaveField();
 
                 try {
@@ -59,6 +72,11 @@ public class BlueFrog extends Frog {
             }
         }
     }
+
+    private void move(Snake snake, int[][]field){
+        strategyMove.move(this,snake,field);
+    }
+
     public void kill(){
     }
 }

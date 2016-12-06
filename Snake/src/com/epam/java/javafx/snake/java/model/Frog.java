@@ -10,7 +10,9 @@ public abstract class Frog implements Runnable {
     // 2 - Blue
 
     public abstract int getX();
+    public abstract void setX(int value);
     public abstract int getY();
+    public abstract void setY(int value);
     public abstract int getType();
     public abstract void kill();
 }

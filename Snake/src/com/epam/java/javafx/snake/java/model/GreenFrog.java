@@ -1,6 +1,7 @@
 package com.epam.java.javafx.snake.java.model;
 
 import com.epam.java.javafx.snake.java.controller.Game;
+import com.epam.java.javafx.snake.java.model.impl.IMoveFrog;
 
 /**
  * Created by Aleksandr_Vaniukov on 11/24/2016.
@@ -11,20 +12,30 @@ public class GreenFrog extends Frog {
     private int type;
     private Game game;
     private boolean death;
+    private IMoveFrog strategyMove;
 
     public GreenFrog(int x,int y){
         this.x=x;
         this.y=y;
         this.type=Constants.GREEN_FROG;
         this.death=true;
+        strategyMove=new MoveGreenFrog();
     }
 
     public int getX(){
         return this.x;
     }
 
+    public void setX(int value){
+        this.x=value;
+    }
+
     public int getY(){
         return this.y;
+    }
+
+    public void setY(int value){
+        this.y=value;
     }
 
     public int getType(){
@@ -43,11 +54,9 @@ public class GreenFrog extends Frog {
                     break;
                 }
 
-                /*
-                if(canMove(x,y,field)) {
-                    move(field);
-                }
-                */
+
+                move(game.getSnake(),field);
+
 
                 game.leaveField();
                 try {
@@ -65,60 +74,8 @@ public class GreenFrog extends Frog {
         }
     }
 
-    private void move(int[][]field){
-
-        eraseTrace(field);
-
-        x++;
-
-        if(x<0){
-            x=Options.getCol()-1;
-        }
-
-        if(x>Options.getCol()-1){
-            x=0;
-        }
-
-        if(y<0){
-            y=Options.getRow()-1;
-        }
-
-        if(y>Options.getRow()-1){
-            y=0;
-        }
-
-        track(field);
-    }
-
-    public void track(int[][]field){
-        field[x][y]=2;
-    }
-
-    private void eraseTrace(int[][]field){
-        field[x][y]=0;
-    }
-
-    private boolean canMove(int x, int y, int[][] field){
-
-        x++;
-
-        if(x<0){
-            x=Options.getCol()-1;
-        }
-
-        if(x>Options.getCol()-1){
-            x=0;
-        }
-
-        if(y<0){
-            y=Options.getRow()-1;
-        }
-
-        if(y>Options.getRow()-1){
-            y=0;
-        }
-
-        return field[x][y]==0;
+    private void move(Snake snake, int[][]field){
+        strategyMove.move(this,snake,field);
     }
 
     public void kill(){

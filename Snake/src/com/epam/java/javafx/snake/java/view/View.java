@@ -52,7 +52,7 @@ public class View {
 
         final long timeStart = System.currentTimeMillis();
         KeyFrame kf = new KeyFrame(
-                Duration.millis(1),//Duration.seconds(0.017), 60 FPS
+                Duration.millis(34),//Duration.seconds(0.017), 60 FPS
                 new EventHandler<ActionEvent>()
                 {
                     long times=0;

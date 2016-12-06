@@ -34,7 +34,7 @@ public class Game{
 
         this.generateFrogs=new GenerateFrogs();
         this.score=0;
-        this.field=new int[Options.getRow()][Options.getCol()];
+        this.field=new int[Options.getCol()][Options.getRow()];
         this.number=new Random(Calendar.getInstance().getTimeInMillis());
         this.snake=new Snake();
         fillFieldSnake();
@@ -168,8 +168,8 @@ public class Game{
         int x=0;
         int y=0;
         do{
-            x=number.nextInt(Options.getRow());
-            y=number.nextInt(Options.getCol());
+            x=number.nextInt(Options.getCol());
+            y=number.nextInt(Options.getRow());
         }
         while(field[x][y]!=Constants.EMPTY_CELL);
 
