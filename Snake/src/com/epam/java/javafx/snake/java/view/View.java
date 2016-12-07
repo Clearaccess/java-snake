@@ -15,13 +15,11 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class View {
 
-    private final int GREEN=0;
-    private final int RED=1;
-    private final int BLUE=2;
     @FXML
     private Label score;
     @FXML
@@ -29,10 +27,13 @@ public class View {
     @FXML
     private SplitPane sppane;
 
-    private AnimationTimer timer;
-    private Timeline gameLoop;
+    private final int GREEN=0;
+    private final int RED=1;
+    private final int BLUE=2;
+    private DrawGame artGame;
     private Game world;
     private GraphicsContext gc;
+    private Timeline gameLoop;
 
     @FXML
     private void initialize() {
@@ -41,8 +42,9 @@ public class View {
         gc = canvas.getGraphicsContext2D();
         sppane.setOnMouseClicked(event-> clickedMouse(event.getButton().toString()));
         System.out.println("Start");
-
         world=Game.getGame();
+        artGame=new DrawGame(gc);
+        world.addObserver(artGame);
         drawField();
         drawSnake(world.getSnake().getBody());
         drawFrogs(world.getFrogs());
@@ -55,22 +57,47 @@ public class View {
                 Duration.millis(34),//Duration.seconds(0.017), 60 FPS
                 new EventHandler<ActionEvent>()
                 {
-                    long times=0;
-                    long timesFrog=0;
                     public void handle(ActionEvent ae)
-                    {
-                        draw(times);
+                    {;
                         score.setText(Integer.toString(world.getScore()));
-                        if(Options.getSpeed()==times){
-
-                            //System.out.println("Times zero out");
-                            times=0;
-                        }
-                        times++;
                     }
                 });
         gameLoop.getKeyFrames().add( kf );
+    }
 
+    @FXML
+    public void clickStart() {
+        world.startGame();
+        gameLoop.play();
+    }
+
+    @FXML
+    public void clickPause(){
+        world.pauseGame();
+        if(world.isPause()) {
+            gameLoop.pause();
+        } else{
+            gameLoop.play();
+        }
+    }
+
+    @FXML
+    public void clickStop(){
+        world.stopGame();
+        closeGame();
+    }
+
+    public void clickedMouse(String button){
+        if(button.equals("PRIMARY")){
+            world.getSnake().turnLeft();
+        }
+        if(button.equals("SECONDARY")){
+            world.getSnake().turnRight();
+        }
+    }
+
+    private void closeGame(){
+        System.exit(1);
     }
 
     private void draw(long time) {
@@ -78,6 +105,7 @@ public class View {
         drawSnake(world.getSnake().getBody());
         drawFrogs(world.getFrogs());
     }
+
     private void drawField(){
         for (int i = 0; i < Options.getRow(); i++) {
             for (int j = 0; j < Options.getCol(); j++) {
@@ -119,12 +147,11 @@ public class View {
         gc.fillOval(x * Constants.OFFSET + x * Constants.WIDTH_CELL+(offsetX), y * Constants.OFFSET + y * Constants.HEIGHT_CELL+(offsetY), ((double)Constants.WIDTH_CELL)/2.0, ((double)Constants.HEIGHT_CELL)/2.0);
     }
 
-    private void drawSnake(CopyOnWriteArrayList<SnakePart> body){
+    private void drawSnake(LinkedList<SnakePart> body){
 
         int count=-1;
         for(SnakePart i: body) {
             count++;
-            //System.out.println(i.getX()+" "+i.getY());
             if (count == 0) {
                 drawHeadSnake(i.getX(), i.getY());
                 continue;
@@ -137,7 +164,7 @@ public class View {
         }
     }
 
-    private void drawFrogs(CopyOnWriteArrayList<Frog> frogs){
+    private void drawFrogs(LinkedList<Frog> frogs){
         for(Frog i:frogs){
             switch (i.getType()){
                 case GREEN:
@@ -151,46 +178,5 @@ public class View {
                     break;
             }
         }
-    }
-
-    @FXML
-    public void clickStart() {
-        world.startGame();
-        gameLoop.play();
-    }
-
-    @FXML
-    public void clickPause(){
-
-        world.pauseGame();
-        if(world.isPause()) {
-            gameLoop.pause();
-        } else{
-            gameLoop.play();
-        }
-
-    }
-
-    @FXML
-    public void clickStop(){
-        //timer.stop();
-        world.stopGame();
-        closeGame();
-    }
-
-    public void clickedMouse(String button){
-        if(button.equals("PRIMARY")){
-            world.getSnake().turnLeft();
-            System.out.println("LEFT");
-        }
-        if(button.equals("SECONDARY")){
-            world.getSnake().turnRight();
-            System.out.println("RIGHT");
-        }
-    }
-
-    private void closeGame(){
-        gameLoop.stop();
-        System.exit(1);
     }
 }

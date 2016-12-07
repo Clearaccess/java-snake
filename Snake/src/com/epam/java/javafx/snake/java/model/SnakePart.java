@@ -9,10 +9,6 @@ public class SnakePart {
 
     private int x;
     private int y;
-    //If
-    //type==1 that is head of snake
-    //type==2 that is body of snake
-    //type==3 that is queue of snake
     private int type;
 
     public SnakePart(int x, int y){

@@ -1,7 +1,10 @@
 package com.epam.java.javafx.snake.java.controller;
 
 import com.epam.java.javafx.snake.java.model.*;
+import com.epam.java.javafx.snake.java.view.impl.IObsever;
+import javafx.fxml.FXML;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.Random;
@@ -13,22 +16,21 @@ import java.util.concurrent.locks.ReentrantLock;
  * Created by Aleksandr_Vaniukov on 11/23/2016.
  */
 public class Game{
-    private Snake snake;
-    private Thread threadSnake;
-    private CopyOnWriteArrayList<Frog>frogs;
-    private LinkedList<Thread> threadsFrogs;
-    private int score;
-    private static Lock lock=new ReentrantLock();
-    private Random number;
-    private GenerateFrogs generateFrogs;
-    //0 - cell is empty;
-    //1 - there is a part of snake on the cell;
-    //2 - there is a frog on the cell;
 
     private static int[][] field;
+    private static Lock lock=new ReentrantLock();
     private static Game game;
     private boolean gameOver;
     private boolean pause;
+    private int score;
+    private Snake snake;
+    private Thread threadSnake;
+    private LinkedList<Frog>frogs;
+    private LinkedList<Thread> threadsFrogs;
+    private Random number;
+    private GenerateFrogs generateFrogs;
+    private IObsever obsever;
+
 
     private Game(){
 
@@ -72,7 +74,7 @@ public class Game{
         return threadsFrogs;
     }
 
-    public CopyOnWriteArrayList<Frog> getFrogs(){
+    public LinkedList<Frog> getFrogs(){
         return frogs;
     }
 
@@ -109,6 +111,7 @@ public class Game{
     }
 
     public void startGame(){
+
         threadSnake=new Thread(snake);
         threadsFrogs=new LinkedList<Thread>();
         for(int i=0;i<frogs.size();i++){
@@ -131,9 +134,28 @@ public class Game{
         Running.running=!Running.running;
     }
 
-    private CopyOnWriteArrayList<Frog> placeFrogs(){
+    public void addObserver(IObsever obsever){
+        this.obsever=obsever;
+    }
+
+    public IObsever getObserver(){
+        return obsever;
+    }
+
+    public void removeFrog(Frog frog){
+        generateFrogs.decrementNumFrog(frog);
+        int index=this.frogs.indexOf(frog);
+        threadsFrogs.get(index).interrupt();
+        threadsFrogs.remove(index);
+        frog.kill();
+        frogs.remove(index);
+        addFrog();
+        threadsFrogs.get(threadsFrogs.size()-1).start();
+    }
+
+    private LinkedList<Frog> placeFrogs(){
         int i=0;
-        CopyOnWriteArrayList<Frog>frogs=new CopyOnWriteArrayList<Frog>();
+        LinkedList<Frog>frogs=new LinkedList<Frog>();
         while(i<Options.getNumFrog()){
             frogs.add(placeFrog());
             i++;
@@ -145,23 +167,6 @@ public class Game{
         Frog newFrog=placeFrog();
         frogs.add(newFrog);
         threadsFrogs.add(new Thread(newFrog));
-        System.out.println("Add frog");
-    }
-
-    public void removeFrog(Frog frog){
-
-        generateFrogs.decrementNumFrog(frog);
-        int index=this.frogs.indexOf(frog);
-
-        System.out.println("Index delete frog "+ index);
-        threadsFrogs.get(index).interrupt();
-        threadsFrogs.remove(index);
-        frog.kill();
-        frogs.remove(index);
-
-        System.out.println("Delete frog");
-        addFrog();
-        threadsFrogs.get(threadsFrogs.size()-1).start();
     }
 
     private Frog placeFrog(){
@@ -180,12 +185,13 @@ public class Game{
 
     private void fillFieldFrogs(){
         for(Frog i:frogs){
-            field[i.getX()][i.getY()]=2;
+            field[i.getX()][i.getY()]=Constants.FROG_INTO_CELL;
         }
     }
+
     private void fillFieldSnake(){
         for(SnakePart i:snake.getBody()){
-            field[i.getX()][i.getY()]=1;
+            field[i.getX()][i.getY()]=Constants.SNAKE_INTO_CELL;
         }
     }
 

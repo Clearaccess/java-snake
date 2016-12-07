@@ -19,7 +19,6 @@ public class GreenFrog extends Frog {
         this.y=y;
         this.type=Constants.GREEN_FROG;
         this.death=true;
-        strategyMove=new MoveGreenFrog();
     }
 
     public int getX(){
@@ -44,6 +43,8 @@ public class GreenFrog extends Frog {
 
     public void run() {
         game=Game.getGame();
+        strategyMove=new MoveGreenFrog(game);
+
         while (Running.running && !Thread.currentThread().isInterrupted() && death){
             if(!Running.pause) {
 
@@ -54,9 +55,7 @@ public class GreenFrog extends Frog {
                     break;
                 }
 
-
                 move(game.getSnake(),field);
-
 
                 game.leaveField();
                 try {
@@ -74,11 +73,11 @@ public class GreenFrog extends Frog {
         }
     }
 
-    private void move(Snake snake, int[][]field){
-        strategyMove.move(this,snake,field);
-    }
-
     public void kill(){
         death=false;
+    }
+
+    private void move(Snake snake, int[][]field){
+        strategyMove.move(this,snake,field);
     }
 }

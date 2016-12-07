@@ -6,22 +6,18 @@ package com.epam.java.javafx.snake.java.model;
 public class Options {
     private static int row=10;
     private static int col=10;
-    private static int length=1;
+    private static int length=2;
     private static int maxLength=50;
     private static int numFrog=1;
-    private static long speed=100;
-    private static long speedFrog=150;
-
-    private static long numGreenFrogs=0;
-    private static long numRedFrogs=0;
-    private static long numBlueFrogs=0;
+    private static long speed=500;
+    private static long speedFrog=750;
 
     public static int getRow(){
         return row;
     }
 
     public static void setRow(int value){
-        if(value>row && row<Constants.MAX_ROW) {
+        if(value>row && Constants.MAX_ROW>=value) {
             row=value;
         }
     }
@@ -31,7 +27,7 @@ public class Options {
     }
 
     public static void setCol(int value){
-        if(value>col && col<Constants.MAX_COL) {
+        if(value>col && Constants.MAX_COL>=value) {
             col=value;
         }
     }
@@ -41,7 +37,7 @@ public class Options {
     }
 
     public static void setLength(int value){
-        if(value>length) {
+        if(value>length && row>=value) {
             length=value;
             maxLength=row*col/10*5;
         }
@@ -56,7 +52,7 @@ public class Options {
     }
 
     public static void setNumFrog(int value){
-        if(value>numFrog) {
+        if(value>numFrog && row*col/10*2>=value) {
             numFrog = value;
         }
     }

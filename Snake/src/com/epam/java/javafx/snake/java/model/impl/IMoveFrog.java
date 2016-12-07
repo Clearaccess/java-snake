@@ -1,5 +1,6 @@
 package com.epam.java.javafx.snake.java.model.impl;
 
+import com.epam.java.javafx.snake.java.controller.Game;
 import com.epam.java.javafx.snake.java.model.Frog;
 import com.epam.java.javafx.snake.java.model.Snake;
 

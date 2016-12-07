@@ -24,9 +24,9 @@ public class GenerateFrogs {
 
     public void decrementNumFrog(Frog frog){
         switch (frog.getType()){
-            case 0: currentNumGreenFrogs--;break;
-            case 1: currentNumRedFrogs--;break;
-            case 2: currentNumBlueFrogs--;break;
+            case Constants.GREEN_FROG: currentNumGreenFrogs--;break;
+            case Constants.RED_FROG: currentNumRedFrogs--;break;
+            case Constants.BLUE_FROG: currentNumBlueFrogs--;break;
         }
     }
 

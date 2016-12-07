@@ -2,6 +2,7 @@ package com.epam.java.javafx.snake.java.model;
 
 import com.epam.java.javafx.snake.java.model.impl.IMoveSnake;
 
+import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -13,7 +14,7 @@ public class MoveSnake implements IMoveSnake {
             snake.eraseTrace(field);
         }
 
-        CopyOnWriteArrayList<SnakePart> body=snake.getBody();
+        LinkedList<SnakePart> body=snake.getBody();
 
         for(int i=body.size()-1, j=body.size()-2;i>0;i--,j--){
             body.get(i).setX(body.get(j).getX());

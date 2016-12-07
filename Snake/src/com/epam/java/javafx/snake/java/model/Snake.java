@@ -3,6 +3,7 @@ package com.epam.java.javafx.snake.java.model;
 import com.epam.java.javafx.snake.java.controller.Game;
 import com.epam.java.javafx.snake.java.model.impl.IMoveSnake;
 
+import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -10,47 +11,24 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class Snake implements Runnable {
 
-    private CopyOnWriteArrayList<SnakePart> body;
-
-    private int growth;
-    //Help to organize one turn
     private boolean wasTurn;
     private boolean wouldGrow;
-    private Game game;
-    private IMoveSnake stratageMove;
-
     private int direction=2;
+    private int growth;
+    private Game game;
+    private LinkedList<SnakePart> body;
+    private IMoveSnake stratageMove;
 
     public Snake(){
 
         this.growth=Options.getLength();
-        this.body=new CopyOnWriteArrayList<SnakePart>();
+        this.body=new LinkedList<SnakePart>();
         this.wasTurn=false;
         this.wouldGrow=false;
         for(int i=Options.getLength()-1;i>=0;i--){
             this.body.add(new SnakePart(0, i));
         }
         stratageMove=new MoveSnake();
-    }
-
-    public CopyOnWriteArrayList<SnakePart> getBody(){
-        return body;
-    }
-
-    public SnakePart getHead(){
-        return this.body.get(0);
-    }
-
-    public SnakePart getQueue(){
-        return this.body.get(this.body.size()-1);
-    }
-
-    public boolean getWouldGrow(){
-        return wouldGrow;
-    }
-
-    public void setWouldGrow(boolean value){
-        wouldGrow=value;
     }
 
     public boolean getWasTurn(){
@@ -61,6 +39,14 @@ public class Snake implements Runnable {
         wasTurn=value;
     }
 
+    public boolean getWouldGrow(){
+        return wouldGrow;
+    }
+
+    public void setWouldGrow(boolean value){
+        wouldGrow=value;
+    }
+
     public int getDirection(){
         return direction;
     }
@@ -69,15 +55,28 @@ public class Snake implements Runnable {
         direction=value;
     }
 
+    public SnakePart getHead(){
+        return this.body.get(0);
+    }
+
+    public LinkedList<SnakePart> getBody(){
+        return body;
+    }
+
+    public SnakePart getQueue(){
+        return this.body.get(this.body.size()-1);
+    }
+
     public void run(){
         game=Game.getGame();
+        System.out.println(Options.getRow()+" "+Options.getCol());
+        System.out.println(Options.getNumFrog());
         while(Running.running) {
 
             if (!Running.pause) {
 
                 int[][] field = game.takeField();
 
-                System.out.println(1);
 
                 move(field);
 
@@ -88,7 +87,6 @@ public class Snake implements Runnable {
                     System.out.println("GAME OVER");
                     break;
                 }
-                System.out.println(1);
 
                 if (isFrogOnCell(field)) {
                     Frog frog = game.getFrog(getHead().getX(), getHead().getY());
@@ -96,22 +94,10 @@ public class Snake implements Runnable {
                     changeScore(frog);
                     game.removeFrog(frog);
                 }
-                System.out.println(1);
 
                 track(field);
 
-                System.out.println(1);
-                for (int i = 0; i < Options.getCol(); i++) {
-                    for (int j = 0; j < Options.getRow(); j++) {
-                        System.out.print(field[i][j]);
-                    }
-                    System.out.println();
-                }
-                System.out.println("__________");
-                System.out.println("Threads: "+game.getThreads().size());
                 game.leaveField();
-
-                System.out.println(2);
 
                 try {
                     Thread.sleep(Options.getSpeed());
@@ -126,10 +112,6 @@ public class Snake implements Runnable {
                 }
             }
         }
-    }
-
-    private void move(int[][] field){
-        stratageMove.move(this,field);
     }
 
     public void turnLeft(){
@@ -164,31 +146,39 @@ public class Snake implements Runnable {
         if(growth-1>1) {
             SnakePart queue=getQueue();
             growth--;
-            field[queue.getX()][queue.getY()]=0;
+            field[queue.getX()][queue.getY()]=Constants.CLEAR_CELL;
+            game.getObserver().update(this,queue.getX(),queue.getY(),Constants.CLEAR_CELL);
             body.remove(getQueue());
         }
     }
 
     public void track(int[][]field){
         SnakePart head=getHead();
-        field[head.getX()][head.getY()]=1;
+        field[head.getX()][head.getY()]=Constants.SNAKE_INTO_CELL;
+        game.getObserver().update(this,head.getX(),head.getY(),Constants.CLEAR_CELL);
+        game.getObserver().update(this,head.getX(),head.getY(),Constants.FILL_CELL);
     }
 
     public void eraseTrace(int[][]field){
         SnakePart queue=getQueue();
-        field[queue.getX()][queue.getY()]=0;
+        field[queue.getX()][queue.getY()]=Constants.CLEAR_CELL;
+        game.getObserver().update(this,queue.getX(),queue.getY(),Constants.CLEAR_CELL);
+    }
+
+    private void move(int[][] field){
+        stratageMove.move(this,field);
     }
 
     private void eat(Frog frog, int[][] field){
         switch (frog.getType()){
-            case 0: growSnake();break;
-            case 1: decreaseSnake(field);break;
+            case Constants.GREEN_FROG: growSnake();break;
+            case Constants.RED_FROG: decreaseSnake(field);break;
         }
     }
 
     private boolean isFrogOnCell(int[][] field){
         SnakePart head=getHead();
-        return field[head.getX()][head.getY()]>=2;
+        return field[head.getX()][head.getY()]==Constants.FROG_INTO_CELL;
     }
 
     private boolean checkEndGame(int[][] field){
@@ -197,7 +187,7 @@ public class Snake implements Runnable {
 
     private boolean ateItself(){
         SnakePart head=this.getHead();
-        CopyOnWriteArrayList<SnakePart>body=this.getBody();
+        LinkedList<SnakePart>body=this.getBody();
         for(int i=1;i<this.getBody().size();i++){
             if((body.get(i).getX()==head.getX())
                     &&
@@ -221,8 +211,8 @@ public class Snake implements Runnable {
 
     private void changeScore(Frog frog){
         switch (frog.getType()){
-            case 0:game.increaseScore(1);break;
-            case 1:game.increaseScore(2);break;
+            case Constants.GREEN_FROG:game.increaseScore(1);break;
+            case Constants.RED_FROG:game.increaseScore(2);break;
         }
     }
 }

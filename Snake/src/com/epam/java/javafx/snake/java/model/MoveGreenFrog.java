@@ -1,13 +1,20 @@
 package com.epam.java.javafx.snake.java.model;
 
+import com.epam.java.javafx.snake.java.controller.Game;
 import com.epam.java.javafx.snake.java.model.impl.IMoveFrog;
 
 /**
  * Created by Aleksandr_Vaniukov on 12/6/2016.
  */
 public class MoveGreenFrog implements IMoveFrog {
-    public void move(Frog frog, Snake snake, int[][] field){
 
+    private Game game;
+
+    public MoveGreenFrog(Game game){
+        this.game=game;
+    }
+
+    public void move(Frog frog, Snake snake, int[][] field){
         int x=frog.getX();
         int y=frog.getY();
 
@@ -57,15 +64,6 @@ public class MoveGreenFrog implements IMoveFrog {
             }
         }
 
-        /*
-        switch (snake.getDirection()){
-            case Constants.UP: y--; break;
-            case Constants.LEFT: x--; break;
-            case Constants.DOWN: y++; break;
-            case Constants.RIGHT: x++; break;
-        }
-        */
-
         if(x<0){
             x=Options.getCol()-1;
         }
@@ -91,12 +89,16 @@ public class MoveGreenFrog implements IMoveFrog {
     }
 
     private boolean canMove(int x, int y, int[][] field){
-        return field[x][y]==0;
+        return field[x][y]==Constants.CLEAR_CELL;
     }
+
     private void eraseTrace(Frog frog, int[][]field){
-        field[frog.getX()][frog.getY()]=0;
+        field[frog.getX()][frog.getY()]=Constants.CLEAR_CELL;
+        game.getObserver().update((GreenFrog) frog,frog.getX(),frog.getY(),Constants.CLEAR_CELL);
     }
+
     private void track(Frog frog, int[][]field){
-        field[frog.getX()][frog.getY()]=2;
+        field[frog.getX()][frog.getY()]=Constants.FROG_INTO_CELL;
+        game.getObserver().update((GreenFrog) frog,frog.getX(),frog.getY(),Constants.FILL_CELL);
     }
 }

@@ -17,8 +17,7 @@ public class RedFrog extends Frog{
     public RedFrog(int x,int y){
         this.x=x;
         this.y=y;
-        this.type=1;
-        this.strategyMove=new MoveRedFrog();
+        this.type=Constants.RED_FROG;
     }
 
     public int getX(){
@@ -43,6 +42,7 @@ public class RedFrog extends Frog{
 
     public void run() {
         game=Game.getGame();
+        strategyMove=new MoveRedFrog(game);
         while (Running.running && !Thread.currentThread().isInterrupted()){
             if(!Running.pause) {
 
